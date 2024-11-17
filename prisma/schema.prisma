@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Survey {
+  id       String   @id @default(cuid())
+  question String   @unique
+  options  Option[]
+}
+
+model Option {
+  id       String   @id @default(cuid())
+  option   String
+  survey   Survey   @relation(fields: [surveyId], references: [id])
+  surveyId String
+}

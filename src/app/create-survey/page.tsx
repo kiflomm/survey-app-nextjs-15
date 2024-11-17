@@ -42,6 +42,7 @@ export default function CreateSurvey() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) { 
+        console.log(values)
         axios.post('/api/create-survey', values)
             .then(response => {
                 console.log(response.data)
