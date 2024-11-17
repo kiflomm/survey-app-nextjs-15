@@ -12,6 +12,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import axios from 'axios'
 
 const formSchema = z.object({
     question: z.string().min(5, {
@@ -40,8 +41,14 @@ export default function CreateSurvey() {
         name: "options",
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
+    function onSubmit(values: z.infer<typeof formSchema>) { 
+        axios.post('/api/create-survey', values)
+            .then(response => {
+                console.log(response.data)
+            })
+            .catch(error => {
+                console.log(error)
+        })
     }
 
     return (
