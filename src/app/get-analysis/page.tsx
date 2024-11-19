@@ -10,17 +10,18 @@ import {
 } from "@/components/ui/card"
 
 interface IOption {
-    id: string;
-    option: string;
-    surveyId: string;
+  id: string;
+  option: string;
+  surveyId: string;
 }
 interface Isurvey {
-    id: string;
-    question: string;
-    options: IOption[];
+  id: string;
+  question: string;
+  options: IOption[];
 }
+
 const AnalysisPage = () => {
-  const [analysis, setAnalysis] = useState<Record<string,Record<string,number>>>({});
+  const [analysis, setAnalysis] = useState<Record<string, Record<string, number>>>({});
   const [surveys, setSurveys] = useState<Isurvey[]>([]);
 
   useEffect(() => {
@@ -50,31 +51,33 @@ const AnalysisPage = () => {
   }, []);
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold text-center mb-8 gray-red-800">Survey Analysis</h1>
-      <div className="space-y-8">
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <h1 className="text-4xl font-extrabold text-center mb-10 text-gray-900">Survey Analysis</h1>
+      <div className="flex flex-wrap justify-center gap-8">
         {surveys.map((survey) => {
           const surveyAnalysis = analysis[survey.id];
           if (!surveyAnalysis) return null;
 
           return (
-            <Card key={survey.id} className="max-w-2xl mx-auto shadow-lg border border-gray-200 rounded-lg">
-              <CardHeader className="bg-blue-600 text-white p-4 rounded-t-lg">
-                <CardTitle className="text-xl">{survey.question}</CardTitle>
-                <CardDescription className="text-sm text-red-600">Here is how people have responded:</CardDescription>
+            <Card key={survey.id} className="w-full max-w-md shadow-lg rounded-lg flex flex-col justify-between">
+              <CardHeader className="bg-indigo-600 text-white p-5 rounded-t-lg">
+                <CardTitle className="text-2xl">{survey.question}</CardTitle>
+                <CardDescription className="text-sm text-indigo-200 mt-1">
+                  Here is how people have responded:
+                </CardDescription>
               </CardHeader>
-              <CardContent className="p-4 bg-white">
-                <ul className="space-y-2">
+              <CardContent className="p-5 bg-white">
+                <ul className="space-y-3">
                   {survey.options.map((option) => (
-                    <li key={option.id} className="flex justify-between items-center p-2 bg-gray-50 rounded-md">
-                      <span className="text-gray-700">{option.option}</span>
-                      <span className="font-semibold text-blue-600">{surveyAnalysis[option.id] || 0} votes</span>
+                    <li key={option.id} className="flex justify-between items-center p-3 bg-indigo-50 rounded-md">
+                      <span className="text-gray-800">{option.option}</span>
+                      <span className="font-bold text-indigo-600">{surveyAnalysis[option.id] || 0} votes</span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
-              <CardFooter className="p-4 bg-gray-100 rounded-b-lg">
-                <p className="text-sm text-red-600">Thank you for participating!</p>
+              <CardFooter className="p-5 bg-indigo-100 rounded-b-lg -mb-px">
+                <p className="text-sm text-indigo-600">Updated at {new Date().toLocaleString()}</p>
               </CardFooter>
             </Card>
           )

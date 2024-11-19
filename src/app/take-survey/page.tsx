@@ -25,7 +25,7 @@ const SurveyList = () => {
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
-
+  const [thanks,setThanks] = useState('Please hit the finsh button to submit your response');
   useEffect(() => {
     setLoading(true);
     axios.get('/api/get-survey')
@@ -54,18 +54,19 @@ const SurveyList = () => {
     setCurrentIndex(currentIndex - 1);
   };
 
-  const isLastQuestion = currentIndex >= surveys.length - 1;
+  const isLastQuestion = currentIndex >= surveys.length;
   const areAllQuestionsAnswered = Object.keys(answers).length === surveys.length;
 
   const handleFinish = () => {
     if (!areAllQuestionsAnswered) {
-      alert('You must answer all questions to submit the questionnaire');
+      alert('You must answer all questions to submit the questionnaire.');
       return;
     }
     console.log(answers);
     axios.post('/api/submit-survey', answers)
       .then(response => {
         console.log(response.data);
+        setThanks("Thank you for taking the survey!your response has been submitted.");
       })
       .catch(error => {
         console.error(error);
@@ -87,10 +88,7 @@ const SurveyList = () => {
           {currentIndex === surveys.length ? "": `${currentIndex + 1} / ${surveys.length}`}
           {currentIndex === surveys.length ? 
           <div>
-            <p>Thank you for taking the survey</p>
-            <Link href="/">
-                <Button>Go Home</Button>
-            </Link>
+            <p>{thanks}</p>
             
           </div> : ''}
         </CardDescription>

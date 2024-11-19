@@ -2,6 +2,7 @@
 import { z } from 'zod'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -26,7 +27,6 @@ const formSchema = z.object({
         message: "At least two options are required"
     })
 })
-
 export default function CreateSurvey() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -35,24 +35,26 @@ export default function CreateSurvey() {
             options: [{ option: "" }, { option: "" }],
         },
     })
-
+    
     const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: "options",
     })
-
+    
     function onSubmit(values: z.infer<typeof formSchema>) { 
-        console.log(values)
+        setIsSubmitting(true);
         axios.post('/api/create-survey', values)
-            .then(response => {
-                response.data;
-                form.reset(); // Reset the form fields after successful submission
-            })
-            .catch(error => {
-                console.log(error)
+        .then(response => {
+            setIsSubmitting(false);
+            form.reset(); 
+        })
+        .catch(error => {
+            console.log(error)
         })
     }
 
+    const  [isSubmitting, setIsSubmitting] = useState(false);
+    
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 md:space-y-8 bg-white rounded px-6 py-8 shadow-md">
@@ -104,7 +106,7 @@ export default function CreateSurvey() {
                     </Button>
                 </div>
                 <Button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-white rounded px-4 py-2">
-                    Submit
+                 {isSubmitting? "Submitting..." : "Submit"}
                 </Button>
             </form>
         </Form>
