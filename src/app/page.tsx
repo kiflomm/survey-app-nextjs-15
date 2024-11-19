@@ -36,6 +36,11 @@ export default function Home() {
             Create Survey
           </Button>
           </Link>
+          <Link href={"/get-analysis"}>
+          <Button variant="default" className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 transition duration-300">
+            Get Analysis
+          </Button>
+          </Link>
         </div>
       </DialogHeader>
     </DialogContent>

@@ -1,15 +1,23 @@
 'use client'
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardTitle
+} from '@/components/ui/card';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-
+import Link from 'next/link';
 interface Option {
   id: string;
   option: string;
-  surveyId:string;
+  surveyId: string;
 }
 interface ISurvey {
-  id:string;
-  question: string; 
+  id: string;
+  question: string;
   options: Option[]
 }
 const SurveyList = () => {
@@ -31,10 +39,10 @@ const SurveyList = () => {
       });
   }, []);
 
-  const currentSurvey = surveys[currentIndex] ?? {question: '', options: []};
+  const currentSurvey = surveys[currentIndex] ?? { question: '', options: [] };
 
   const handleSubmit = (optionId: string) => {
-    setAnswers(answers => ({...answers, [currentSurvey.id]: optionId}));
+    setAnswers(answers => ({ ...answers, [currentSurvey.id]: optionId }));
     setCurrentIndex(currentIndex + 1);
   };
 
@@ -53,7 +61,7 @@ const SurveyList = () => {
     if (!areAllQuestionsAnswered) {
       alert('You must answer all questions to submit the questionnaire');
       return;
-    } 
+    }
     console.log(answers);
     axios.post('/api/submit-survey', answers)
       .then(response => {
@@ -62,42 +70,67 @@ const SurveyList = () => {
       .catch(error => {
         console.error(error);
       });
-    
+
   };
 
   return (
-    <div>
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <div>
-          <h2>{currentSurvey.question}</h2>
-          <ul>
+    loading ? (
+      <div className="flex justify-center items-center h-full">
+        <div className="text-xl font-semibold">Loading...</div>
+      </div>
+    ) : (
+      <Card className="max-w-md mx-auto my-8 p-6 shadow-lg">
+        <CardTitle className="text-2xl font-bold text-center mb-4">
+          {currentSurvey.question}
+        </CardTitle>
+        <CardDescription className="text-center text-gray-600 mb-6">
+          {currentIndex === surveys.length ? "": `${currentIndex + 1} / ${surveys.length}`}
+          {currentIndex === surveys.length ? 
+          <div>
+            <p>Thank you for taking the survey</p>
+            <Link href="/">
+                <Button>Go Home</Button>
+            </Link>
+            
+          </div> : ''}
+        </CardDescription>
+        <CardContent>
+          <ul className="space-y-4">
             {currentSurvey.options.map(option => (
               <li key={option.id}>
-                <button onClick={() => handleSubmit(option.id)}>
+                <Button className="w-full" onClick={() => handleSubmit(option.id)}>
                   {option.option}
-                </button>
+                </Button>
               </li>
             ))}
           </ul>
-          <div className="flex justify-between">
-            <button onClick={handlePrev} disabled={currentIndex === 0}>
-              Prev
+        </CardContent>
+        <CardFooter className="flex justify-between mt-6">
+          <button
+            className="bg-gray-300 text-gray-800 px-4 py-2 rounded disabled:opacity-50"
+            onClick={handlePrev}
+            disabled={currentIndex === 0}
+          >
+            Prev
+          </button>
+          {isLastQuestion ? (
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded"
+              onClick={handleFinish}
+            >
+              Finish
             </button>
-            {isLastQuestion ? (
-              <button onClick={handleFinish}>
-                Finish
-              </button>
-            ) : (
-              <button onClick={handleNext}>
-                Next
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+          ) : (
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded"
+              onClick={handleNext}
+            >
+              Next
+            </button>
+          )}
+        </CardFooter>
+      </Card>
+    )
   );
 };
 

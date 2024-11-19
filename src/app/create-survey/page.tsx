@@ -46,6 +46,7 @@ export default function CreateSurvey() {
         axios.post('/api/create-survey', values)
             .then(response => {
                 response.data;
+                form.reset(); // Reset the form fields after successful submission
             })
             .catch(error => {
                 console.log(error)
@@ -54,33 +55,33 @@ export default function CreateSurvey() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 md:space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 md:space-y-8 bg-white rounded px-6 py-8 shadow-md">
                 <FormField
                     control={form.control}
                     name="question"
                     render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-lg font-semibold">Question</FormLabel>
-                            <FormControl>
-                                <Input placeholder="What is your question?" {...field} className="border-gray-300 rounded-md" />
+                        <FormItem className="flex flex-col">
+                            <FormLabel className="text-2xl font-semibold text-gray-900">What would you like to ask?</FormLabel>
+                            <FormControl className="mt-1">
+                                <Input placeholder="What is your question?" {...field} className="border-2 border-gray-300 rounded-md px-3 py-2" />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-red-500 text-sm" />
                         </FormItem>
                     )}
                 />
-                <div>
-                    <FormLabel className="text-lg font-semibold">Options</FormLabel>
+                <div className="space-y-4">
+                    <FormLabel className="text-2xl font-semibold text-gray-900">Options</FormLabel>
                     {fields.map((field, index) => (
                         <div key={field.id} className="flex items-center space-x-2">
                             <FormField
                                 control={form.control}
                                 name={`options.${index}.option`}
                                 render={({ field: optionField }) => (
-                                    <FormItem>
-                                        <FormControl>
-                                            <Input placeholder={`Option ${index + 1}`} {...optionField} className="border-gray-300 rounded-md" />
+                                    <FormItem className="flex flex-col">
+                                        <FormControl className="mt-1">
+                                            <Input placeholder={`Option ${index + 1}`} {...optionField} className="border-2 border-gray-300 rounded-md px-3 py-2" />
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage className="text-red-500 text-sm" />
                                     </FormItem>
                                 )}
                             />
@@ -88,7 +89,7 @@ export default function CreateSurvey() {
                                 type="button"
                                 onClick={() => remove(index)}
                                 variant="destructive"
-                                className="bg-red-500 hover:bg-red-600 text-white"
+                                className="bg-red-500 hover:bg-red-600 text-white rounded px-2 py-1"
                             >
                                 Remove
                             </Button>
@@ -97,12 +98,12 @@ export default function CreateSurvey() {
                     <Button
                         type="button"
                         onClick={() => append({ option: "" })}
-                        className="mt-2 bg-blue-500 hover:bg-blue-600 text-white"
+                        className="mt-2 bg-blue-500 hover:bg-blue-600 text-white rounded px-2 py-1"
                     >
                         Add Option
                     </Button>
                 </div>
-                <Button type="submit" className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white">
+                <Button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-white rounded px-4 py-2">
                     Submit
                 </Button>
             </form>
