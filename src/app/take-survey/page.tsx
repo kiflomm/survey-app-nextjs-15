@@ -1,78 +1,105 @@
-'use client';
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import axios from "axios";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
+'use client'
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
-const formSchema = z.object({
-    question: z.string().min(5, {
-        message: "Question header must be at least 5 characters long"
-    }),
-    options: z.array(z.object({
-        option: z.string().min(1, {
-            message: "Answer cannot be empty"
-        })
-    }))
-});
-
-const TakeSurveyPage = () => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [surveyQuestions, setSurveyQuestions] = useState<z.infer<typeof formSchema>[]>([]);
-  const [isLoading,setIsLoading] = useState<boolean>(true);
+interface Option {
+  id: string;
+  option: string;
+  surveyId:string;
+}
+interface ISurvey {
+  id:string;
+  question: string; 
+  options: Option[]
+}
+const SurveyList = () => {
+  const [surveys, setSurveys] = useState<ISurvey[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    axios.get('/api/get-survey').then(response => {
-      setSurveyQuestions(response.data);
-      setIsLoading(false)
-    });
+    setLoading(true);
+    axios.get('/api/get-survey')
+      .then(response => {
+        setSurveys(response.data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error(error);
+        setLoading(false);
+      });
   }, []);
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      question: "",
-      options: [{ option: "" }, { option: "" }],
-    },
-  });
+  const currentSurvey = surveys[currentIndex] ?? {question: '', options: []};
+
+  const handleSubmit = (optionId: string) => {
+    setAnswers(answers => ({...answers, [currentSurvey.id]: optionId}));
+    setCurrentIndex(currentIndex + 1);
+  };
 
   const handleNext = () => {
-    if (currentQuestion < surveyQuestions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-      form.reset({ question: "", options: surveyQuestions[currentQuestion + 1]?.options });
-    } else {
-      // Handle form submission or finish survey
-      console.log('Survey completed', form.getValues());
-    }
+    setCurrentIndex(currentIndex + 1);
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex(currentIndex - 1);
+  };
+
+  const isLastQuestion = currentIndex >= surveys.length - 1;
+  const areAllQuestionsAnswered = Object.keys(answers).length === surveys.length;
+
+  const handleFinish = () => {
+    if (!areAllQuestionsAnswered) {
+      alert('You must answer all questions to submit the questionnaire');
+      return;
+    } 
+    console.log(answers);
+    axios.post('/api/submit-survey', answers)
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    
   };
 
   return (
-    isLoading ? <p>Loading survey</p> : <Form {...form}>
-    <FormField
-      control={form.control}
-      name="question"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Question {currentQuestion + 1}</FormLabel>
-          <FormControl>
-              <RadioGroup value={field.value} onChange={field.onChange}>
-              {field && surveyQuestions[currentQuestion]?.options.map((option, index) => (
-                <RadioGroupItem key={index} value={option.option}>
+    <div>
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <div>
+          <h2>{currentSurvey.question}</h2>
+          <ul>
+            {currentSurvey.options.map(option => (
+              <li key={option.id}>
+                <button onClick={() => handleSubmit(option.id)}>
                   {option.option}
-                </RadioGroupItem>
-              ))}
-            </RadioGroup>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="flex justify-between">
+            <button onClick={handlePrev} disabled={currentIndex === 0}>
+              Prev
+            </button>
+            {isLastQuestion ? (
+              <button onClick={handleFinish}>
+                Finish
+              </button>
+            ) : (
+              <button onClick={handleNext}>
+                Next
+              </button>
+            )}
+          </div>
+        </div>
       )}
-    />
-    <Button onClick={handleNext}>Next</Button>
-  </Form>
+    </div>
   );
-}
-;
-export default TakeSurveyPage;
+};
+
+export default SurveyList;
+

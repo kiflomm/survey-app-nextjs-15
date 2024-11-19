@@ -12,5 +12,12 @@ CREATE TABLE "Option" (
     CONSTRAINT "Option_surveyId_fkey" FOREIGN KEY ("surveyId") REFERENCES "Survey" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+-- CreateTable
+CREATE TABLE "Answer" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "surveyId" TEXT NOT NULL,
+    "optionId" TEXT NOT NULL
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Survey_question_key" ON "Survey"("question");

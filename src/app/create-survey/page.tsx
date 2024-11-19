@@ -45,7 +45,7 @@ export default function CreateSurvey() {
         console.log(values)
         axios.post('/api/create-survey', values)
             .then(response => {
-                console.log(response.data)
+                response.data;
             })
             .catch(error => {
                 console.log(error)

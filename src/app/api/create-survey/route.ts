@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import {prisma} from '@/lib/prisma';
 export async function POST(request: Request) {
   const { question, options } = await request.json();
-  console.log(question, options);
+  //console.log(question, options);
   try {
     await prisma.survey.create({
         data: {

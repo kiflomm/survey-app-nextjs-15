@@ -19,3 +19,9 @@ model Option {
   survey   Survey   @relation(fields: [surveyId], references: [id])
   surveyId String
 }
+
+model Answer {
+  id Int @id @default(autoincrement())
+  surveyId String
+  optionId String
+}
